@@ -24,6 +24,23 @@ impl Password {
 
         count >= self.lower && count <= self.upper
     }
+
+    fn validate_rule2(&self) -> bool {
+        let chars: Vec<char> = self.plain_text.chars().collect();
+
+        let lower = if ((self.lower - 1) as usize) < chars.len() {
+            chars[(self.lower - 1) as usize]
+        } else {
+            '!'
+        };
+        let upper = if ((self.upper - 1) as usize) < chars.len() {
+            chars[(self.upper - 1) as usize]
+        } else {
+            '!'
+        };
+
+        (lower == self.enforced_char || upper == self.enforced_char) && lower != upper
+    }
 }
 
 fn from_digit(input: &str) -> Result<u8, std::num::ParseIntError> {
@@ -74,8 +91,10 @@ pub fn run() -> Result<(), anyhow::Error> {
     let (_, input_vec) = password(&input).unwrap();
 
     let result_1 = calculate_part_1(&input_vec)?;
+    let result_2 = calculate_part_2(&input_vec)?;
 
     println!("result day 2 part 1 {}", result_1);
+    println!("result day 2 part 2 {}", result_2);
 
     Ok(())
 }
@@ -84,6 +103,16 @@ fn calculate_part_1(passwords: &[Password]) -> Result<i32, anyhow::Error> {
     let mut count = 0;
     for p in passwords {
         if p.validate_rule1() {
+            count += 1;
+        }
+    }
+    Ok(count)
+}
+
+fn calculate_part_2(passwords: &[Password]) -> Result<i32, anyhow::Error> {
+    let mut count = 0;
+    for p in passwords {
+        if p.validate_rule2() {
             count += 1;
         }
     }
@@ -101,4 +130,50 @@ fn part1() {
     let result_1 = calculate_part_1(&input_vec).unwrap();
 
     assert_eq!(2, result_1);
+}
+
+#[test]
+fn part2() {
+    let input = "1-3 a: abcde
+1-3 b: cdefg
+2-9 c: ccccccccc";
+
+    let (_, input_vec) = password(&input).unwrap();
+
+    let result_1 = calculate_part_2(&input_vec).unwrap();
+
+    assert_eq!(1, result_1);
+}
+
+#[test]
+fn part2_1() {
+    let input = "1-3 a: abcde";
+
+    let (_, input_vec) = password(&input).unwrap();
+
+    let result_1 = calculate_part_2(&input_vec).unwrap();
+
+    assert_eq!(1, result_1);
+}
+
+#[test]
+fn part2_2() {
+    let input = "1-3 b: cdefg";
+
+    let (_, input_vec) = password(&input).unwrap();
+
+    let result_1 = calculate_part_2(&input_vec).unwrap();
+
+    assert_eq!(0, result_1);
+}
+
+#[test]
+fn part2_3() {
+    let input = "2-9 c: ccccccccc";
+
+    let (_, input_vec) = password(&input).unwrap();
+
+    let result_1 = calculate_part_2(&input_vec).unwrap();
+
+    assert_eq!(0, result_1);
 }
