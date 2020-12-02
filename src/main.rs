@@ -1,4 +1,5 @@
 mod day1;
+mod day2;
 
 use clap::Clap;
 
@@ -14,6 +15,7 @@ fn main() -> Result<(), anyhow::Error> {
 
     match opts.day {
         1 => day1::run()?,
+        2 => day2::run()?,
         _ => eprintln!("illegal day number"),
     };
 
