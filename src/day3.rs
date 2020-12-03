@@ -27,7 +27,13 @@ pub fn run() -> Result<(), anyhow::Error> {
 
     let result1 = calc_1(&map)?;
 
+    let mut result2: u64 = 1;
+    for (d_x, d_y) in &[(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)] {
+        result2 *= calc_2(&map, d_x, d_y).unwrap();
+    }
+
     println!("result day 3 part 1 {}", result1);
+    println!("result day 3 part 2 {}", result2);
 
     Ok(())
 }
@@ -48,10 +54,21 @@ fn parse_map(input: &str) -> Result<Map, anyhow::Error> {
     Ok(Map { rows })
 }
 
-fn calc_1(map: &Map) -> Result<i32, anyhow::Error> {
+fn calc_1(map: &Map) -> Result<u64, anyhow::Error> {
     let mut nr_of_trees = 0;
     for r in 0..map.len() {
         if map.is_tree(r * 3, r)? {
+            nr_of_trees += 1;
+        }
+    }
+
+    Ok(nr_of_trees)
+}
+
+fn calc_2(map: &Map, d_x: &usize, d_y: &usize) -> Result<u64, anyhow::Error> {
+    let mut nr_of_trees = 0;
+    for (i, r) in (0..map.len()).step_by(*d_y).enumerate() {
+        if map.is_tree(i * d_x, r)? {
             nr_of_trees += 1;
         }
     }
@@ -78,4 +95,28 @@ fn part1() {
     let result1 = calc_1(&map).unwrap();
 
     assert_eq!(7, result1);
+}
+
+#[test]
+fn part2() {
+    let input = "..##.......
+#...#...#..
+.#....#..#.
+..#.#...#.#
+.#...##..#.
+..#.##.....
+.#.#.#....#
+.#........#
+#.##...#...
+#...##....#
+.#..#...#.#";
+
+    let map = parse_map(input).unwrap();
+
+    let mut result2 = 1;
+    for (d_x, d_y) in &[(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)] {
+        result2 *= calc_2(&map, d_x, d_y).unwrap();
+    }
+
+    assert_eq!(336, result2);
 }
