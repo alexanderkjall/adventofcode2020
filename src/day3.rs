@@ -20,7 +20,7 @@ impl Map {
     }
 }
 
-pub fn run() -> Result<(), anyhow::Error> {
+pub fn run() -> Result<(String, String), anyhow::Error> {
     let input: String = std::fs::read_to_string("res/day3-input")?.parse()?;
 
     let map = parse_map(&input)?;
@@ -32,10 +32,7 @@ pub fn run() -> Result<(), anyhow::Error> {
         result2 *= calc_2(&map, d_x, d_y).unwrap();
     }
 
-    println!("result day 3 part 1 {}", result1);
-    println!("result day 3 part 2 {}", result2);
-
-    Ok(())
+    Ok((format!("{}", result1), format!("{}", result2)))
 }
 
 fn parse_map(input: &str) -> Result<Map, anyhow::Error> {

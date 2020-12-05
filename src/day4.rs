@@ -133,7 +133,7 @@ fn validate_ecl(ecl: &Option<String>) -> bool {
     }
 }
 
-pub fn run() -> Result<(), anyhow::Error> {
+pub fn run() -> Result<(String, String), anyhow::Error> {
     let input: String = std::fs::read_to_string("res/day4-input")?.parse()?;
 
     let passports = parse_passports(&input)?;
@@ -141,10 +141,7 @@ pub fn run() -> Result<(), anyhow::Error> {
     let result_1 = passports.iter().filter(|p| p.is_valid()).count();
     let result_2 = passports.iter().filter(|p| p.validate_all_fields()).count();
 
-    println!("result day 4 part 1 {}", result_1);
-    println!("result day 4 part 2 {}", result_2);
-
-    Ok(())
+    Ok((format!("{}", result_1), format!("{}", result_2)))
 }
 
 fn not_space_or_newline(c: char) -> bool {

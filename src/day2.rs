@@ -85,7 +85,7 @@ fn password(input: &str) -> IResult<&str, Vec<Password>> {
     Ok((input, passwords))
 }
 
-pub fn run() -> Result<(), anyhow::Error> {
+pub fn run() -> Result<(String, String), anyhow::Error> {
     let input: String = std::fs::read_to_string("res/day2-input")?.parse()?;
 
     let (_, input_vec) = password(&input).unwrap();
@@ -93,10 +93,7 @@ pub fn run() -> Result<(), anyhow::Error> {
     let result_1 = calculate_part_1(&input_vec)?;
     let result_2 = calculate_part_2(&input_vec)?;
 
-    println!("result day 2 part 1 {}", result_1);
-    println!("result day 2 part 2 {}", result_2);
-
-    Ok(())
+    Ok((format!("{}", result_1), format!("{}", result_2)))
 }
 
 fn calculate_part_1(passwords: &[Password]) -> Result<i32, anyhow::Error> {
