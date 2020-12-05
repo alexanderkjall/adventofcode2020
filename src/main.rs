@@ -8,7 +8,7 @@ use anyhow::anyhow;
 use clap::Clap;
 
 #[derive(Clap)]
-#[clap(version = "1.0", author = "Kevin K. <kbknapp@gmail.com>")]
+#[clap(version = "1.0", author = "Alexander Kjäll <alexander.kjall@gmail.com>")]
 struct Opts {
     #[clap(short, long, default_value = "1")]
     day: u8,
