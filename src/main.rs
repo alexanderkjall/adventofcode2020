@@ -3,12 +3,16 @@ mod day2;
 mod day3;
 mod day4;
 mod day5;
+mod day6;
 
 use anyhow::anyhow;
 use clap::Clap;
 
 #[derive(Clap)]
-#[clap(version = "1.0", author = "Alexander Kjäll <alexander.kjall@gmail.com>")]
+#[clap(
+    version = "1.0",
+    author = "Alexander Kjäll <alexander.kjall@gmail.com>"
+)]
 struct Opts {
     #[clap(short, long, default_value = "1")]
     day: u8,
@@ -23,6 +27,7 @@ fn main() -> Result<(), anyhow::Error> {
         3 => day3::run()?,
         4 => day4::run()?,
         5 => day5::run()?,
+        6 => day6::run()?,
         _ => return Err(anyhow!("illegal day number")),
     };
 
