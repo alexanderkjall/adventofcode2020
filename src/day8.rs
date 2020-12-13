@@ -173,12 +173,7 @@ acc +6";
     let program = parse_program(&input).unwrap();
 
     let it = ProgramMutationIter { program, pos: 0 };
-    let result_2 = it
-        .map(|p| match execute_to_end(&p) {
-            Ok(acc) => acc,
-            Err(_) => 0,
-        })
-        .sum();
+    let result_2 = it.map(|p| execute_to_end(&p).unwrap_or(0)).sum();
 
     assert_eq!(8, result_2);
 }

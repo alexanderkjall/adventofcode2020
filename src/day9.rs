@@ -5,7 +5,23 @@ pub fn run() -> Result<(String, String), anyhow::Error> {
 
     let data = parse(&input);
     let result_1 = find_pattern_breaker(&data, 25)?;
-    Ok((format!("{}", result_1), format!("")))
+    let result_2 = find_range_that_sums_to(&data, result_1);
+    Ok((format!("{}", result_1), format!("{}", result_2)))
+}
+
+fn find_range_that_sums_to(data: &[u64], target: u64) -> u64 {
+    for i in 0..data.len() {
+        for j in i..data.len() {
+            let sum: u64 = data[i..j].iter().sum();
+            if sum == target {
+                return data[i..j].iter().min().unwrap() + data[i..j].iter().max().unwrap();
+            }
+            if sum > target {
+                break;
+            }
+        }
+    }
+    0
 }
 
 fn find_pattern_breaker(data: &[u64], lookback: usize) -> Result<u64, anyhow::Error> {
@@ -60,4 +76,33 @@ fn test_part_1() {
     let result_1 = find_pattern_breaker(&data, 5).unwrap();
 
     assert_eq!(127, result_1);
+}
+
+#[test]
+fn test_part_2() {
+    let input = "35
+20
+15
+25
+47
+40
+62
+55
+65
+95
+102
+117
+150
+182
+127
+219
+299
+277
+309
+576";
+
+    let data = parse(&input);
+    let result_2 = find_range_that_sums_to(&data, 127);
+
+    assert_eq!(62, result_2);
 }
