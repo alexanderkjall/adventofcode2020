@@ -20,8 +20,9 @@ pub fn run() -> Result<(String, String), anyhow::Error> {
 
     let (graph, nodes) = rules_to_graph(&rules);
     let result_1 = calc_ways_to_colour("shiny gold", &graph, &nodes);
+    let result_2 = calc_bags_inside("shiny gold", &graph, &nodes);
 
-    Ok((format!("{}", result_1), format!("")))
+    Ok((format!("{}", result_1), format!("{}", result_2)))
 }
 
 fn from_bag_str(
@@ -169,6 +170,43 @@ fn calc_ways_to_colour(
     num_ways
 }
 
+fn calc_bags_inside(
+    source_colour: &str,
+    graph: &DiGraph<String, u32>,
+    nodes: &HashMap<String, NodeIndex<u32>>,
+) -> u32 {
+    let mut num_bags = 0;
+
+    let source = nodes.get(source_colour).unwrap();
+    for t in nodes.keys() {
+        if t == source_colour {
+            continue;
+        }
+        let target = nodes.get(t).unwrap();
+
+        let ways = petgraph::algo::all_simple_paths::<Vec<_>, _>(graph, *source, *target, 0, None)
+            .collect::<Vec<_>>();
+        for way in ways {
+            num_bags += cost_of_path(&way, graph);
+        }
+    }
+
+    num_bags
+}
+
+fn cost_of_path(path: &[NodeIndex<u32>], graph: &DiGraph<String, u32>) -> u32 {
+    let mut cost = 1;
+    for (i, node) in path.iter().enumerate() {
+        if i == 0 {
+            continue;
+        }
+        for edge in graph.edges_connecting(path[i - 1], *node) {
+            cost *= edge.weight();
+        }
+    }
+    cost
+}
+
 #[test]
 fn test_parse() {
     let input = "light red bags contain 1 bright white bag, 2 muted yellow bags.
@@ -189,4 +227,24 @@ dotted black bags contain no other bags.";
     let result_1 = calc_ways_to_colour("shiny gold", &graph, &nodes);
 
     assert_eq!(4, result_1);
+}
+
+#[test]
+fn test_part2() {
+    let input = "shiny gold bags contain 2 dark red bags.
+dark red bags contain 2 dark orange bags.
+dark orange bags contain 2 dark yellow bags.
+dark yellow bags contain 2 dark green bags.
+dark green bags contain 2 dark blue bags.
+dark blue bags contain 2 dark violet bags.
+dark violet bags contain no other bags.";
+
+    let rules = parse_rules(input);
+
+    assert_eq!(7, rules.len());
+
+    let (graph, nodes) = rules_to_graph(&rules);
+    let result_2 = calc_bags_inside("shiny gold", &graph, &nodes);
+
+    assert_eq!(126, result_2);
 }
