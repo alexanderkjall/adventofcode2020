@@ -65,12 +65,7 @@ pub fn run() -> Result<(String, String), anyhow::Error> {
     let result_1 = execute_to_recursion(&program);
 
     let it = ProgramMutationIter { program, pos: 0 };
-    let result_2: i32 = it
-        .map(|p| match execute_to_end(&p) {
-            Ok(acc) => acc,
-            Err(_) => 0,
-        })
-        .sum();
+    let result_2: i32 = it.map(|p| execute_to_end(&p).unwrap_or(0)).sum();
 
     Ok((format!("{}", result_1), format!("{}", result_2)))
 }
