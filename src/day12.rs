@@ -50,8 +50,9 @@ pub fn run() -> Result<(String, String), anyhow::Error> {
 
     let orders = parse(&input)?;
     let result_1 = move_ship(&orders)?;
+    let result_2 = move_waypoint(&orders)?;
 
-    Ok((format!("{}", result_1), format!("")))
+    Ok((format!("{}", result_1), format!("{}", result_2)))
 }
 
 fn move_ship(orders: &[Order]) -> Result<i32, anyhow::Error> {
@@ -87,6 +88,72 @@ fn move_ship(orders: &[Order]) -> Result<i32, anyhow::Error> {
         }
     }
     Ok(x.abs() + y.abs())
+}
+
+fn move_waypoint(orders: &[Order]) -> Result<i32, anyhow::Error> {
+    let mut boat_x = 0;
+    let mut boat_y = 0;
+    let mut waypoint_x = 10;
+    let mut waypoint_y = -1;
+
+    for o in orders {
+        match o.direction {
+            Direction::NORTH => waypoint_y -= o.distance,
+            Direction::SOUTH => waypoint_y += o.distance,
+            Direction::EAST => waypoint_x += o.distance,
+            Direction::WEST => waypoint_x -= o.distance,
+            Direction::LEFT => match o.distance {
+                90 => {
+                    let (x, y) = transpose(waypoint_x, waypoint_y, 3);
+                    waypoint_x = x;
+                    waypoint_y = y;
+                }
+                180 => {
+                    let (x, y) = transpose(waypoint_x, waypoint_y, 2);
+                    waypoint_x = x;
+                    waypoint_y = y;
+                }
+                270 => {
+                    let (x, y) = transpose(waypoint_x, waypoint_y, 1);
+                    waypoint_x = x;
+                    waypoint_y = y;
+                }
+                _ => return Err(anyhow!("unknown direction")),
+            },
+            Direction::RIGHT => match o.distance {
+                90 => {
+                    let (x, y) = transpose(waypoint_x, waypoint_y, 1);
+                    waypoint_x = x;
+                    waypoint_y = y;
+                }
+                180 => {
+                    let (x, y) = transpose(waypoint_x, waypoint_y, 2);
+                    waypoint_x = x;
+                    waypoint_y = y;
+                }
+                270 => {
+                    let (x, y) = transpose(waypoint_x, waypoint_y, 3);
+                    waypoint_x = x;
+                    waypoint_y = y;
+                }
+                _ => return Err(anyhow!("unknown direction")),
+            },
+            Direction::FORWARD => {
+                boat_x += waypoint_x * o.distance;
+                boat_y += waypoint_y * o.distance;
+            }
+        }
+    }
+    Ok(boat_x.abs() + boat_y.abs())
+}
+
+fn transpose(x: i32, y: i32, steps: i32) -> (i32, i32) {
+    match steps {
+        1 => (-y, x),
+        2 => (-x, -y),
+        3 => (y, -x),
+        _ => (0, 0),
+    }
 }
 
 fn parse(input: &str) -> Result<Vec<Order>, anyhow::Error> {
@@ -126,4 +193,18 @@ F11";
     let result_1 = move_ship(&orders).unwrap();
 
     assert_eq!(25, result_1);
+}
+
+#[test]
+fn test_part_2() {
+    let input = "F10
+N3
+F7
+R90
+F11";
+
+    let orders = parse(&input).unwrap();
+    let result_2 = move_waypoint(&orders).unwrap();
+
+    assert_eq!(286, result_2);
 }
